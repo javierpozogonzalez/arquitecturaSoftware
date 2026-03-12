@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ coche.marca }} {{ coche.modelo }} — Taller de Coches</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 14px; color: #222; }
+        h1 { margin-bottom: 10px; }
+        h2 { margin-top: 18px; }
+        .ficha { border: 1px solid #d0d0d0; background: #fafafa; padding: 10px 12px; margin-bottom: 10px; }
+        .ficha p { margin: 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #cfcfcf; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f2f2f2; }
+        a { color: #1a5fb4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-bottom: 14px; font-size: 14px; }
+        .alerta { border: 1px solid #d8d8d8; background: #f7f7f7; padding: 10px 12px; margin-top: 10px; }
+        .desc { color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="{% url 'lista_coches' %}">← Volver a la lista de coches</a>
+    </div>
+
+    <h1>{{ coche.marca }} {{ coche.modelo }}</h1>
+
+    <div class="ficha">
+        <p> <strong>Matrícula:</strong> {{ coche.matricula }}</p>
+        <p> <strong>Propietario:</strong>
+            <a href="{% url 'detalle_cliente' coche.cliente.id %}">{{ coche.cliente.nombre }}</a>
+        </p>
+        <p><strong>Teléfono del propietario:</strong> {{ coche.cliente.telefono }}</p>
+        <p> <strong>Email del propietario:</strong> {{ coche.cliente.email }}</p>
+    </div>
+
+    <h2>Historial de servicios ({{ coche_servicios|length }})</h2>
+
+    {% if coche_servicios %}
+    <table>
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>Descripción</th>
+                <th>Fecha de realización</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cs in coche_servicios %}
+            <tr>
+                <td><strong>{{ cs.servicio.nombre }}</strong></td>
+                <td class="desc">{{ cs.servicio.descripcion }}</td>
+                <td>{{ cs.fecha }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alerta">
+        Este coche no tiene servicios registrados todavía.
+    </div>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ cliente.nombre }} — Taller de Coches</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 14px; color: #222; }
+        h1 { margin-bottom: 10px; }
+        h2 { margin-top: 18px; }
+        .ficha { border: 1px solid #d0d0d0; background: #fafafa; padding: 10px 12px; margin-bottom: 10px; }
+        .ficha p { margin: 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #cfcfcf; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        a { color: #1a5fb4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-bottom: 14px; font-size: 14px; }
+        .alerta { border: 1px solid #d8d8d8; background: #f7f7f7; padding: 10px 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="{% url 'lista_clientes' %}"> Volver a la lista de clientes</a>
+    </div>
+
+    <h1>{{ cliente.nombre }}</h1>
+
+    <div class="ficha">
+        <p> <strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+        <p> <strong>Email:</strong> {{ cliente.email }}</p>
+    </div>
+
+    <h2>Coches registrados ({{ coches|length }})</h2>
+
+    {% if coches %}
+    <table>
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Matrícula</th>
+                <th>Servicios</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for coche in coches %}
+            <tr>
+                <td>{{ coche.marca }}</td>
+                <td>{{ coche.modelo }}</td>
+                <td>{{ coche.matricula }}</td>
+                <td>
+                    <a href="{% url 'buscar_servicios_de_coche' coche.id %}">Ver historial</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alerta">
+         Este cliente no tiene coches registrados en el taller.
+    </div>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios del taller — Taller de Coches</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 14px; color: #222; }
+        h1 { margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #cfcfcf; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f2f2f2; }
+        a { color: #1a5fb4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-bottom: 14px; font-size: 14px; }
+        .desc { color: #555; }
+        .empty { color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="{% url 'lista_clientes' %}"> Ver clientes</a> &nbsp;|&nbsp;
+        <a href="{% url 'lista_coches' %}"> Ver coches</a>
+    </div>
+
+    <h1>Servicios del taller ({{ servicios|length }} disponibles)</h1>
+
+    {% if servicios %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del servicio</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.id }}</td>
+                <td><strong>{{ servicio.nombre }}</strong></td>
+                <td class="desc">{{ servicio.descripcion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">No hay servicios registrados en el taller todavía.</p>
+    {% endif %}
+
+</body>
+</html>

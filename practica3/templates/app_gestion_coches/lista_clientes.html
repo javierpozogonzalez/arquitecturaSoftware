@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de clientes — Taller de Coches</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 14px; color: #222; }
+        h1 { margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #cfcfcf; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        a { color: #1a5fb4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-bottom: 14px; font-size: 14px; }
+        .empty { color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="{% url 'lista_coches' %}"> Ver todos los coches</a> &nbsp;|&nbsp;
+        <a href="{% url 'listar_servicios_taller' %}"> Ver todos los servicios</a>
+    </div>
+
+    <h1>Clientes del taller ({{ clientes|length }} registrados)</h1>
+
+    {% if clientes %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.id }}</td>
+                <td><a href="{% url 'detalle_cliente' cliente.id %}">{{ cliente.nombre }}</a></td>
+                <td>{{ cliente.telefono }}</td>
+                <td>{{ cliente.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">No hay clientes registrados en el taller todavía.</p>
+    {% endif %}
+
+</body>
+</html>

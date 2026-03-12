@@ -1,11 +1,18 @@
 import json
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from .models import Cliente, Coche, Servicio, CocheServicio
 
 def lista_clientes(request):
-    clientes = list(Cliente.objects.values("id", "nombre", "telefono", "email"))
-    return JsonResponse(clientes, safe=False)
+    clientes = Cliente.objects.all()
+    return render(request, 'app_gestion_coches/lista_clientes.html', {'clientes': clientes})
+
+
+def lista_coches(request):
+    """EXTRA: Lista todos los coches registrados en el taller."""
+    coches = Coche.objects.select_related('cliente').all()
+    return render(request, 'app_gestion_coches/lista_coches.html', {'coches': coches})
 
 @csrf_exempt
 def registrar_cliente(request):
@@ -72,18 +79,36 @@ def buscar_coches_por_marca(request, marca):
     coches = list(Coche.objects.filter(marca__iexact=marca).values("id", "marca", "modelo", "matricula", "cliente_id"))
     return JsonResponse(coches, safe=False)
 
-@csrf_exempt
 def listar_servicios_taller(request):
-    servicios = list(Servicio.objects.values("id", "nombre", "descripcion"))
-    return JsonResponse(servicios, safe=False)
+    """EXTRA: Muestra todos los servicios disponibles en el taller con cuántas veces se han realizado."""
+    servicios = Servicio.objects.all()
+    return render(request, 'app_gestion_coches/lista_servicios.html', {'servicios': servicios})
 
-@csrf_exempt
-def buscar_cliente(request, cliente_id):
+def detalle_cliente(request, cliente_id):
     try:
-        cliente = Cliente.objects.values("id", "nombre", "telefono", "email").get(id=cliente_id)
-        return JsonResponse(cliente)
+        cliente = Cliente.objects.get(id=cliente_id)
+        coches = Coche.objects.filter(cliente=cliente)
+        contexto = {
+            'cliente': cliente,
+            'coches': coches,
+        }
+        return render(request, 'app_gestion_coches/detalle_cliente.html', contexto)
     except Cliente.DoesNotExist:
         return JsonResponse({"error": "Cliente no encontrado"}, status=404)
+
+
+def detalle_coche(request, coche_id):
+    """EXTRA: Muestra el detalle de un coche con su propietario y el historial de servicios."""
+    try:
+        coche = Coche.objects.select_related('cliente').get(id=coche_id)
+        coche_servicios = CocheServicio.objects.filter(coche=coche).select_related('servicio')
+        contexto = {
+            'coche': coche,
+            'coche_servicios': coche_servicios,
+        }
+        return render(request, 'app_gestion_coches/detalle_coche.html', contexto)
+    except Coche.DoesNotExist:
+        return JsonResponse({"error": "Coche no encontrado"}, status=404)
 
 @csrf_exempt
 def buscar_coche_por_matricula(request, matricula):
@@ -117,24 +142,14 @@ def buscar_coches_de_cliente(request, cliente_id):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-@csrf_exempt
 def buscar_servicios_de_coche(request, coche_id):
     try:
-        coche = Coche.objects.get(id=coche_id)
-        servicios = list(
-            CocheServicio.objects.filter(coche=coche)
-            .select_related('servicio')
-            .values("servicio_id", "servicio__nombre", "servicio__descripcion")
-        )
-        respuesta = {
-            "coche": {
-                "id": coche.id,
-                "marca": coche.marca,
-                "modelo": coche.modelo,
-                "matricula": coche.matricula,
-            },
-            "servicios": servicios,
+        coche = Coche.objects.select_related('cliente').get(id=coche_id)
+        coche_servicios = CocheServicio.objects.filter(coche=coche).select_related('servicio')
+        contexto = {
+            'coche': coche,
+            'coche_servicios': coche_servicios,
         }
-        return JsonResponse(respuesta)
+        return render(request, 'app_gestion_coches/servicios_coche.html', contexto)
     except Coche.DoesNotExist:
         return JsonResponse({"error": "Coche no encontrado"}, status=404)
