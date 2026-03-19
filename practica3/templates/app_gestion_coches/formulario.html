@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 24px auto; padding: 0 14px; color: #222; }
+        h1 { margin-bottom: 14px; }
+        form { border: 1px solid #cfcfcf; padding: 14px; background: #fafafa; }
+        p { margin: 10px 0; }
+        label { display: inline-block; margin-bottom: 4px; font-weight: bold; }
+        input, select, textarea { width: 100%; max-width: 100%; padding: 7px; border: 1px solid #c0c0c0; }
+        textarea { min-height: 90px; }
+        button { margin-top: 10px; padding: 7px 14px; }
+        .errores { color: #b00020; margin-top: 8px; }
+        .nav { margin-bottom: 14px; font-size: 14px; }
+        a { color: #1a5fb4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="{% url 'lista_clientes' %}">Clientes</a> |
+        <a href="{% url 'lista_coches' %}">Coches</a> |
+        <a href="{% url 'listar_servicios_taller' %}">Servicios</a>
+    </div>
+
+    <h1>{{ titulo }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if form.errors %}
+        <div class="errores">Revisa los campos marcados en el formulario.</div>
+        {% endif %}
+
+        <button type="submit">Guardar</button>
+    </form>
+
+    {% if filtrar_coches_por_cliente %}
+    {{ coches_data|json_script:"coches-data" }}
+    <script>
+        (function () {
+            const clienteSelect = document.getElementById('id_cliente');
+            const cocheSelect = document.getElementById('id_coche');
+            const cochesData = JSON.parse(document.getElementById('coches-data').textContent);
+
+            if (!clienteSelect || !cocheSelect) {
+                return;
+            }
+
+            function rellenarCoches() {
+                const clienteId = clienteSelect.value;
+                const cocheSeleccionado = cocheSelect.value;
+
+                cocheSelect.innerHTML = '';
+
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '---------';
+                cocheSelect.appendChild(placeholder);
+
+                if (!clienteId) {
+                    return;
+                }
+
+                cochesData
+                    .filter(coche => String(coche.cliente_id) === String(clienteId))
+                    .forEach(coche => {
+                        const option = document.createElement('option');
+                        option.value = coche.id;
+                        option.textContent = `${coche.marca} ${coche.modelo} ${coche.matricula}`;
+                        if (String(coche.id) === String(cocheSeleccionado)) {
+                            option.selected = true;
+                        }
+                        cocheSelect.appendChild(option);
+                    });
+            }
+
+            clienteSelect.addEventListener('change', rellenarCoches);
+            rellenarCoches();
+        })();
+    </script>
+    {% endif %}
+</body>
+</html>

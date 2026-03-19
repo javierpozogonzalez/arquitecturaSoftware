@@ -1,8 +1,9 @@
 import json
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .models import Cliente, Coche, Servicio, CocheServicio
+from .forms import UsuarioForm, CocheForm, ServicioConClienteForm
 
 def lista_clientes(request):
     clientes = Cliente.objects.all()
@@ -13,6 +14,61 @@ def lista_coches(request):
     """EXTRA: Lista todos los coches registrados en el taller."""
     coches = Coche.objects.select_related('cliente').all()
     return render(request, 'app_gestion_coches/lista_coches.html', {'coches': coches})
+
+
+def nuevo_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_clientes')
+    else:
+        form = UsuarioForm()
+
+    return render(request, 'app_gestion_coches/formulario.html', {
+        'form': form,
+        'titulo': 'Nuevo usuario',
+    })
+
+
+def nuevo_coche(request):
+    if request.method == 'POST':
+        form = CocheForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_coches')
+    else:
+        form = CocheForm()
+
+    return render(request, 'app_gestion_coches/formulario.html', {
+        'form': form,
+        'titulo': 'Nuevo coche',
+    })
+
+
+def nuevo_servicio(request):
+    if request.method == 'POST':
+        form = ServicioConClienteForm(request.POST)
+        if form.is_valid():
+            servicio = form.save()
+            coche = form.cleaned_data['coche']
+            CocheServicio.objects.create(coche=coche, servicio=servicio)
+            return redirect('listar_servicios_taller')
+    else:
+        form = ServicioConClienteForm()
+
+    coches_data = list(
+        Coche.objects.select_related('cliente').values(
+            'id', 'cliente_id', 'marca', 'modelo', 'matricula'
+        )
+    )
+
+    return render(request, 'app_gestion_coches/formulario.html', {
+        'form': form,
+        'titulo': 'Nuevo servicio',
+        'filtrar_coches_por_cliente': True,
+        'coches_data': coches_data,
+    })
 
 @csrf_exempt
 def registrar_cliente(request):

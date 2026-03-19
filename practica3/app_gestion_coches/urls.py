@@ -3,7 +3,8 @@ from .views import (
     lista_clientes, registrar_cliente, registrar_coche, registrar_servicio,
     buscar_cliente_por_email, buscar_coches_por_marca, listar_servicios_taller,
     detalle_cliente, buscar_coche_por_matricula, buscar_coches_de_cliente,
-    buscar_servicios_de_coche, lista_coches, detalle_coche
+    buscar_servicios_de_coche, lista_coches, detalle_coche,
+    nuevo_usuario, nuevo_coche, nuevo_servicio
 )
 
 urlpatterns = [
@@ -14,6 +15,9 @@ urlpatterns = [
     path('coches/', lista_coches, name='lista_coches'),
     path('coches/<int:coche_id>/', detalle_coche, name='detalle_coche'),
     path('servicios/', listar_servicios_taller, name='listar_servicios_taller'),
+    path('usuarios/nuevo/', nuevo_usuario, name='nuevo_usuario'),
+    path('coches/nuevo/', nuevo_coche, name='nuevo_coche'),
+    path('servicios/nuevo/', nuevo_servicio, name='nuevo_servicio'),
 
     path('clientes/registrar/', registrar_cliente, name='registrar_cliente'),
     path('coches/registrar/', registrar_coche, name='registrar_coche'),
