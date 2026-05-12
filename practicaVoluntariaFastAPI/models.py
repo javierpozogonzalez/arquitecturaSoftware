@@ -18,7 +18,7 @@ class Cliente(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True)
 
-    coches = relationship("Coche", back_populates="cliente")
+    coches = relationship("Coche", back_populates="cliente_ref")
 
 
 class Coche(Base):
@@ -28,9 +28,10 @@ class Coche(Base):
     marca = Column(String, index=True)
     modelo = Column(String, index=True)
     matricula = Column(String, unique=True, index=True)
-    cliente_id = Column(Integer, ForeignKey("clientes.id"))
+    cliente = Column(String, index=True)
+    cliente_id = Column(Integer, ForeignKey("clientes.id"), nullable=True)
 
-    cliente = relationship("Cliente", back_populates="coches")
+    cliente_ref = relationship("Cliente", back_populates="coches")
     servicios = relationship("Servicio", secondary=coche_servicio_association, back_populates="coches")
 
 
